@@ -1,18 +1,20 @@
 provider "google" {}
 
+#docker run -it -v $PWD:/root -w /root --entrypoint "" hashicorp/terraform:light sh
+
 resource "google_compute_network" "vpc_network" {
-  name                    = "cd-vpc"
+  name                    = "vpc-coodesh"
   auto_create_subnetworks = false
 }
 
 resource "google_compute_subnetwork" "subnet" {
-  name          = "cd-subnet"
+  name          = "subnet-coodesh"
   ip_cidr_range = "10.0.0.0/24"
   network       = google_compute_network.vpc_network.self_link
 }
 
 resource "google_compute_firewall" "default-allow-http-https-ssh-icmp" {
-  name        = "cd-allow-http-https-ssh-icmp"
+  name        = "default-allow-http-https-ssh-icmp"
   network     = google_compute_network.vpc_network.self_link
 
   allow {
@@ -50,11 +52,12 @@ resource "google_compute_instance" "coodesh-webserver" {
   }
 
   machine_type = "e2-micro"
+
   metadata = {
-      startup-script = local.startup_script_content
+    startup-script = "echo \"Executando comandos após a instalação ....\""
   }
 
-  name = "cd-webserver"
+  name = "coodesh-webserver"
 
   scheduling {
     automatic_restart   = false
@@ -69,8 +72,8 @@ resource "google_compute_instance" "coodesh-webserver" {
 
   tags = ["http-server", "https-server", "ssh"]
 
-  network_interface {
-    network    = google_compute_network.vpc_network.self_link
+    network_interface {
+    network = google_compute_network.vpc_network.self_link
     subnetwork = google_compute_subnetwork.subnet.self_link
     access_config {
       // Ephemeral IP
@@ -78,14 +81,4 @@ resource "google_compute_instance" "coodesh-webserver" {
   }
 }
 
-terraform {
-  backend "gcs" {
-    bucket  = "coodesh-bucket"
-    prefix  = "terraform/state"
-  }
-}
 
-locals {
-  startup_script_path = "startup-files/startup-script.sh"
-  startup_script_content = file(local.startup_script_path)
-}
