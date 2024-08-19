@@ -1,20 +1,15 @@
 # Devops na Google Cloud
 
-Este projeto consiste em realizar provisionamento de um servidor Ubuntu 22.04 LTS e hospedá-lo no na Google Cloud, juntamente com na criação de uma VPN e um bucket para armazenar o estado da infraestrutura; Utilizando CI-CD do gitlab para a pipeline e infra-as-code com o terraform, com diversas ferramentas e configurações na melhor prática possível segundo as recomendações da GCP com segurança, provisionadas totalmente por código.
+  Este projeto consiste em realizar provisionamento de um servidor Ubuntu 22.04 LTS e hospedá-lo no na Google Cloud, juntamente com na criação de uma VPN e um bucket para armazenar o estado da infraestrutura; Utilizando CI-CD do gitlab para a pipeline e infra-as-code com o terraform, com diversas ferramentas e configurações na melhor prática possível segundo as recomendações da GCP com segurança, provisionadas totalmente por código.
 
 ## Tecnologias utilizadas
 
-### Ferramentas
-- Docker
-- Terraform
-- Nginx
-
-### Linguagens
-- Python
-- Shell script
-
-### Framework
-- Flask
+Ferramentas | Linguagens | Frameworks | Docker images
+:---:|:---:|:---:|:---:
+Docker|Shell script|Flask|ubuntu:22.04
+Terraform|Python|-|alpine
+Nginx|HCL|-|docker:27.1.2
+GCP CLI|JSON|-|docker:27.1.2-dind
 
 ## Instruções de instalação e provisionamento.
 
@@ -99,7 +94,11 @@ gcloud iam service-accounts list
 ```
 - [ ] Gere o arquivo de chave de service account (json).
 ```
-gcloud iam service-accounts keys create key.json --iam-account <email-da-service-account-desejada>
+gcloud iam service-accounts keys create key.json --iam-account <email-da-service-account-desejada>;cat <<EOF >> .gitignore
+
+#Service account key
+key.json
+EOF
 ```
 - [ ] Setando variáveis de ambiente do project-id, credenciasi necessárias e região onde estará a VPS.
 ```
@@ -154,11 +153,11 @@ curl http://<ip-publico-da-vps>
 
 ## Diagrama da infraestrutua.
 
-![diagrama-infra](./diagrama-infra.png)
+![diagrama-infra](./static/images/diagrama-infra.png)
 
 ## Fluxograma da pipeline.
 
-![fluxgrama-pipeline](./fluxograma-pipeline.png)
+![fluxgrama-pipeline](./static/images/fluxograma-pipeline.png)
 
 ## Descritivo da Pipeline.
 
