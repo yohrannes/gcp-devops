@@ -38,3 +38,4 @@ terraform.rc
 
 #Service account key
 key.json
+key.json.b64
