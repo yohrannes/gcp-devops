@@ -134,12 +134,17 @@ gcloud projects add-iam-policy-binding $GOOGLE_CLOUD_PROJECT \
   --role "roles/compute.securityAdmin"
 
 ```
-
-- [ ] Inicializando o terraform, e provisionando a VPS.
+- [ ] Salvar o estado do terraform no bucket
+  Obs: Precisará alterar aqui e no arquivo main.tf coodesh-bucket para o nome do seu bucket desejado.
 ```
-terraform init
-terraform plan
-terraform apply
+gsutil mb gs://coodesh-bucket
+```
+- [ ] Inicializando o terraform, verificando o estado da infra e salvando no binário actual-plan, provisionando VPS e mostrando tudo que foi criado.
+```
+terraform init -upgrade
+terraform plan actual-plan
+terraform apply actual-plan
+terraform show
 ```
 - [ ] Verificar qual é o ip publico da VPS e copiá-lo(EXTERNAL_IP).
 ```
@@ -148,6 +153,18 @@ gcloud compute instances list
   Após isso será necessário aguardar em torno de 8-10 minutos (devido a baixa potência da VPS) e acessar o link com http no navegador ou via linha de comando mesmo com o curl (lembrando no momento é http e não https ainda).
 ```
 curl http://<ip-publico-da-vps>
+```
+
+  Para destruir completamente os recursos posteriormente precisará executar os seguintes comandos.
+
+- [ ] Excluir o provisionamento do terraform.
+```
+terraform plan -destroy
+terraform destroy -auto-aprove
+```
+- [ ] Excluindo o bucket criado
+```
+gsutil rm -r gs://coodesh-bucket
 ```
   Demais passos para a configuração , teste e provisionamento serão feitos a partir da pipeline do gitlab.
 
